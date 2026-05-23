@@ -22,7 +22,7 @@
     "testemonials"
   ],
   "scripts": {
-    "postinstall": "node dist/track-installation.js && node dist/npm-scripts/verify-ripgrep.js || node -e \"process.exit(0)\"",
+    "postinstall": "node scripts/postinstall.cjs",
     "open-chat": "open -n /Applications/Claude.app",
     "device:install": "cd src/remote-device && npm install",
     "device:start": "tsx src/remote-device/device.ts",
@@ -31,6 +31,8 @@
     "bump": "node scripts/sync-version.js --bump",
     "bump:minor": "node scripts/sync-version.js --bump --minor",
     "bump:major": "node scripts/sync-version.js --bump --major",
+    "check:env": "node scripts/check-node-env.cjs",
+    "prebuild": "npm run check:env",
     "build": "tsc && shx cp setup-claude-server.js uninstall-claude-server.js track-installation.js dist/ && shx chmod +x dist/*.js && shx mkdir -p dist/data && shx cp src/data/onboarding-prompts.json dist/data/ && shx mkdir -p dist/remote-device/scripts && shx cp src/remote-device/scripts/blocking-offline-update.js dist/remote-device/scripts/ && node scripts/build-ui-runtime.cjs",
     "watch": "tsc --watch",
     "start": "node dist/index.js",
@@ -38,7 +40,7 @@
     "setup": "npm install --include=dev && npm run build && node setup-claude-server.js",
     "setup:debug": "npm install && npm run build && node setup-claude-server.js --debug",
     "remove": "npm install && npm run build && node uninstall-claude-server.js",
-    "prepare": "npm run build",
+    "prepare": "npm run check:env && npm run build && node dist/npm-scripts/verify-ripgrep.js || node -e \"process.exit(0)\"",
     "clean": "shx rm -rf dist",
     "test": "npm run build && node test/run-all-tests.js",
     "test:debug": "node --inspect test/run-all-tests.js",
